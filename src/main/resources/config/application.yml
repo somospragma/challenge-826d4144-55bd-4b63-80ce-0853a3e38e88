@@ -1,0 +1,39 @@
+package com.pragma.projectmanagement.infrastructure.controller;
+
+import com.pragma.projectmanagement.application.service.TeamPPService;
+import com.pragma.projectmanagement.domain.model.TeamPPBehavior;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping("/api/teampp")
+public class TeamPPController {
+    @Autowired
+    private TeamPPService teamPPService;
+
+    @GetMapping
+    public Flux<TeamPPBehavior> getAllBehaviors() {
+        return teamPPService.getAllBehaviors();
+    }
+
+    @GetMapping("/{id}")
+    public Mono<ResponseEntity<TeamPPBehavior>> getBehaviorById(@PathVariable Long id) {
+        return teamPPService.getBehaviorById(id)
+               .map(behavior -> ResponseEntity.ok().body(behavior))
+               .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public Mono<TeamPPBehavior> saveBehavior(@RequestBody TeamPPBehavior behavior) {
+        return teamPPService.saveBehavior(behavior);
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> deleteBehavior(@PathVariable Long id) {
+        return teamPPService.deleteBehavior(id)
+               .thenReturn(ResponseEntity.ok().<Void>build());
+    }
+}
